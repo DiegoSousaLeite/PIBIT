@@ -1,51 +1,98 @@
+// Importação de módulos necessários para a aplicação
 import QtQuick 2.15
 import CustomControls 1.0
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.5
-ApplicationWindow {
-    width: 1920
-    height: 960
-    visible: true
-    title: qsTr("Car DashBoard")
-    color: "#1E1E1E"
-    visibility: "FullScreen"
-    property int nextSpeed: 60
 
-    function generateRandom(maxLimit = 70){
-        let rand = Math.random() * maxLimit;
-        rand = Math.floor(rand);
-        return rand;
+// Definição da janela principal da aplicação
+ApplicationWindow {
+    width: 1920                              // Largura da janela
+    height: 960                              // Altura da janela
+    visible: true                            // A janela está visível
+    title: qsTr("Car DashBoard")             // Título da janela
+    color: "#1E1E1E"                         // Cor de fundo da janela
+    visibility: "FullScreen"                 // A janela é exibida em tela cheia
+
+    // Propriedades relacionadas à simulação de um painel de carro
+    property int nextSpeed: 0                 // Próxima velocidade a ser alcançada
+    property int maxRandomSpeed: 10            // Velocidade máxima aleatória
+    property int maxSpeed: 240                 // Velocidade máxima
+    property int speed: 0                      // Velocidade atual
+    property int accelerationIncrement: 5       // Incremento de aceleração
+
+    // Timer para simular aceleração contínua
+    Timer {
+        id: accelerationTimer
+        interval: 3000                         // Intervalo do timer em milissegundos
+        running: true                          // O timer está em execução
+        onTriggered: {
+            startAcceleration();               // Função chamada quando o timer é acionado
+        }
     }
 
-    Timer{
+    // Timer para atualizar a velocidade
+    Timer {
+        id: speedTimer
+        interval: 500                          // Intervalo do timer em milissegundos
+        running: true                          // O timer está em execução
+        onTriggered: {
+            updateSpeed();                     // Função chamada quando o timer é acionado
+        }
+    }
+
+    // Função para iniciar a aceleração
+    function startAcceleration() {
+        accelerationTimer.restart();          // Reinicia o timer de aceleração
+    }
+
+    // Função para atualizar a velocidade
+    function updateSpeed() {
+        if (accelerationTimer.running) {
+            speed += accelerationIncrement;   // Incrementa a velocidade
+            if (speed >= maxSpeed) {
+                speed = maxSpeed;
+                accelerationTimer.stop();      // Para o timer quando atinge a velocidade máxima
+            }
+        } else {
+            nextSpeed = generateRandom();      // Gera uma nova velocidade aleatória
+        }
+    }
+
+    // Função para gerar uma velocidade aleatória
+    function generateRandom() {
+        var newSpeed = speed += Math.random() * (maxRandomSpeed + 1);
+        return Math.min(newSpeed, maxSpeed);  // Garante que a velocidade não ultrapasse maxSpeed
+    }
+
+    // Função para atualizar rótulos de tempo
+    function updateTimeLabels() {
+        currentTimeLabel.text = Qt.formatDateTime(new Date(), "hh:mm");
+        currentDateLabel.text = Qt.formatDateTime(new Date(), "dd/MM/yyyy");
+    }
+
+    // Timer para atualizar a velocidade aleatória em intervalos regulares
+    Timer {
         repeat: true
         interval: 3000
         running: true
         onTriggered: {
-            nextSpeed = generateRandom()
+            nextSpeed = generateRandom();
         }
     }
 
-    Timer{
-        id:speedTimer
+    // Timer para atualizar o rótulo de velocidade em intervalos regulares
+    Timer {
+        id: speedTimerr
         repeat: true
         interval: 500
         running: true
         onTriggered: {
-            var currentSpeed = speedLabel.text
-            if(nextSpeed > currentSpeed){
-                for(let i = currentSpeed; i< nextSpeed ;i++){
-                    speedLabel.text = i
-                }
-            }else{
-                for(let j = nextSpeed; j< currentSpeed ;j++){
-                    speedLabel.text = j
-                }
-            }
+            speedLabel.text = Math.floor(nextSpeed);
         }
     }
 
+    // Atalho para fechar a aplicação ao pressionar a tecla de saída padrão
     Shortcut {
         sequence: StandardKey.Quit
         context: Qt.ApplicationShortcut
@@ -53,6 +100,7 @@ ApplicationWindow {
     }
 
 
+    // Componente de imagem principal (dashboard)
     Image {
         id: dashboard
         width: parent.width
@@ -60,10 +108,7 @@ ApplicationWindow {
         anchors.centerIn: parent
         source: "qrc:/assets/Dashboard.svg"
 
-        /*
-          Top Bar Of Screen
-        */
-
+        // Seção superior da tela (Top Bar)
         Image {
             id: topBar
             width: 1357
@@ -90,63 +135,79 @@ ApplicationWindow {
                 source: "qrc:/assets/Low beam headlights.svg"
             }
 
-            Label{
-                text: "19:30"
-                font.pixelSize: 32
-                font.family: "Inter"
-                font.bold: Font.DemiBold
-                color: "#FFFFFF"
-                anchors.top: parent.top
-                anchors.topMargin: 10
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
+            Label {
+                    id: currentTimeLabel
+                    text: Qt.formatDateTime(new Date(), "hh:mm")
+                    font.pixelSize: 32
+                    font.family: "Inter"
+                    font.bold: Font.DemiBold
+                    color: "#FFFFFF"
+                    anchors.top: parent.top
+                    anchors.topMargin: 10
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
 
-            Label{
-                text: "02/08/2022"
-                font.pixelSize: 32
-                font.family: "Inter"
-                font.bold: Font.DemiBold
-                color: "#FFFFFF"
-                anchors.right: parent.right
-                anchors.rightMargin: 230
-                anchors.top: parent.top
-                anchors.topMargin: 10
-            }
+                Label {
+                    id: currentDateLabel
+                    text: Qt.formatDateTime(new Date(), "dd/MM/yyyy")
+                    font.pixelSize: 32
+                    font.family: "Inter"
+                    font.bold: Font.DemiBold
+                    color: "#FFFFFF"
+                    anchors.right: parent.right
+                    anchors.rightMargin: 230
+                    anchors.top: parent.top
+                    anchors.topMargin: 10
+                }
         }
 
 
 
-        /*
-          Speed Label
-        */
-
-        Label{
-            id:speedLabel
-            text: "68"
+        // Rótulo de velocidade
+        Label {
+            id: speedLabel
+            text: "0"
             font.pixelSize: 134
             font.family: "Inter"
-            color: "#01E6DE"
             font.bold: Font.DemiBold
             anchors.top: parent.top
-            anchors.topMargin:Math.floor(parent.height * 0.35)
+            anchors.topMargin: Math.floor(parent.height * 0.35)
             anchors.horizontalCenter: parent.horizontalCenter
+            color: {
+                var speedValue = parseInt(text); // Converte o texto para um número inteiro
+                if (speedValue <= 60) {
+                    return "#01E6DE"; // Azul para velocidades até 60
+                } else if (speedValue <= 150) {
+                    return "yellow"; // Amarelo para velocidades de 61 a 150
+                } else {
+                    return "red"; // Vermelho para velocidades acima de 150
+                }
+            }
         }
 
-        Label{
-            text: "MPH"
+        // Rótulo "KM/H"
+        Label {
+            text: "KM/H"
             font.pixelSize: 46
             font.family: "Inter"
-            color: "#01E6DE"
             font.bold: Font.Normal
-            anchors.top:speedLabel.bottom
+            anchors.top: speedLabel.bottom
             anchors.horizontalCenter: parent.horizontalCenter
+            color: {
+                var speedValue = parseInt(speedLabel.text); // Obtém o valor da velocidade do rótulo de velocidade
+                if (speedValue <= 60) {
+                    return "#01E6DE"; // Azul para velocidades até 60
+                } else if (speedValue <= 150) {
+                    return "yellow"; // Amarelo para velocidades de 61 a 150
+                } else {
+                    return "red"; // Vermelho para velocidades acima de 150
+                }
+            }
         }
 
 
-        /*
-          Speed Limit Label
-        */
 
+        // Rótulo de limite de velocidade
         Rectangle{
             id:speedLimit
             width: 130
@@ -161,7 +222,7 @@ ApplicationWindow {
             anchors.bottomMargin: 50
 
             Label{
-                text: "70"
+                text: "110"
                 font.pixelSize: 52
                 font.family: "Inter"
                 font.bold: Font.Bold
@@ -171,23 +232,7 @@ ApplicationWindow {
         }
 
 
-
-        Image {
-            anchors{
-                bottom: speedLimit.top
-                bottomMargin: 30
-                horizontalCenter:speedLimit.horizontalCenter
-            }
-            source: "qrc:/assets/car.png"
-        }
-
-        // IMGonline.com.ua  ==> Compress Image With
-
-
-        /*
-          Left Road
-        */
-
+        // Componente de estrada à esquerda
         Image {
             id: leftRoad
             width: 127
@@ -202,6 +247,7 @@ ApplicationWindow {
             source: "qrc:/assets/Vector 2.svg"
         }
 
+        // Seção de informações à esquerda
         RowLayout{
             spacing: 20
 
@@ -215,7 +261,7 @@ ApplicationWindow {
             RowLayout{
                 spacing: 3
                 Label{
-                    text: "100.6"
+                    text: "28"
                     font.pixelSize: 32
                     font.family: "Inter"
                     font.bold: Font.Normal
@@ -224,7 +270,7 @@ ApplicationWindow {
                 }
 
                 Label{
-                    text: "°F"
+                    text: "°C"
                     font.pixelSize: 32
                     font.family: "Inter"
                     font.bold: Font.Normal
@@ -275,7 +321,7 @@ ApplicationWindow {
             }
 
             Label{
-                text: "78mph"
+                text: "257km/h"
                 font.pixelSize: 32
                 font.family: "Inter"
                 font.bold: Font.Normal
@@ -284,10 +330,7 @@ ApplicationWindow {
             }
         }
 
-        /*
-          Right Road
-        */
-
+        // Componente de estrada à direita
         Image {
             id: rightRoad
             width: 127
@@ -302,10 +345,7 @@ ApplicationWindow {
             source: "qrc:/assets/Vector 1.svg"
         }
 
-        /*
-          Right Side gear
-        */
-
+       // Seção de informações à direita
         RowLayout{
             spacing: 20
             anchors{
@@ -330,6 +370,7 @@ ApplicationWindow {
                 font.family: "Inter"
                 font.bold: Font.Normal
                 font.capitalization: Font.AllUppercase
+                opacity: 0.2
                 color: "#FFFFFF"
             }
 
@@ -357,12 +398,12 @@ ApplicationWindow {
                 font.family: "Inter"
                 font.bold: Font.Normal
                 font.capitalization: Font.AllUppercase
-                opacity: 0.2
+
                 color: "#FFFFFF"
             }
         }
 
-         /*Left Side Icons*/
+        // Ícones do lado esquerdo
         Image {
             id:forthLeftIndicator
             width: 72
@@ -414,8 +455,7 @@ ApplicationWindow {
             source: "qrc:/assets/Rare fog lights.svg"
         }
 
-        /*Right Side Icons*/
-
+        // Ícones do lado direito
         Image {
             id:forthRightIndicator
             width: 56.83
@@ -470,7 +510,7 @@ ApplicationWindow {
             source: "qrc:/assets/FirstRightIcon.svg"
         }
 
-        // Progress Bar
+        // Barra de progresso radial
         RadialBar {
             id:radialBar
             anchors{
@@ -513,7 +553,7 @@ ApplicationWindow {
                 }
 
                 Label{
-                    text: "Battery charge"
+                    text: "Carga da Bateria"
                     font.pixelSize: 28
                     font.family: "Inter"
                     font.bold: Font.Normal
@@ -524,6 +564,7 @@ ApplicationWindow {
             }
         }
 
+        // Layout de coluna para informações adicionais
         ColumnLayout{
             spacing: 40
 
@@ -551,7 +592,7 @@ ApplicationWindow {
                         color: "#FFFFFF"
                     }
                     Label{
-                        text: "Distance"
+                        text: "Distância"
                         font.pixelSize: 20
                         font.family: "Inter"
                         font.bold: Font.Normal
@@ -570,7 +611,7 @@ ApplicationWindow {
 
                 ColumnLayout{
                     Label{
-                        text: "34 mpg"
+                        text: "10 km/l"
                         font.pixelSize: 30
                         font.family: "Inter"
                         font.bold: Font.Normal
@@ -578,7 +619,7 @@ ApplicationWindow {
                         color: "#FFFFFF"
                     }
                     Label{
-                        text: "Avg. Fuel Usage"
+                        text: "Med. de Combustível"
                         font.pixelSize: 20
                         font.family: "Inter"
                         font.bold: Font.Normal
@@ -597,7 +638,7 @@ ApplicationWindow {
 
                 ColumnLayout{
                     Label{
-                        text: "78 mph"
+                        text: "95 km/h"
                         font.pixelSize: 30
                         font.family: "Inter"
                         font.bold: Font.Normal
@@ -605,7 +646,7 @@ ApplicationWindow {
                         color: "#FFFFFF"
                     }
                     Label{
-                        text: "Avg. Speed"
+                        text: "Vel. Média"
                         font.pixelSize: 20
                         font.family: "Inter"
                         font.bold: Font.Normal

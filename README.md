@@ -1,13 +1,16 @@
-<<<<<<< HEAD
-# Car-Dashboard
-Car Dashboard Using Qt QML
+# PIBIT
+Trabalho de iniciação científica do aluno da UnB Diego Sousa Leite
 
-## QML Car Dashboard
-![alt text](https://github.com/cppqtdev/Car-Dashboard/blob/main/code2.png)
-  
-##Figma Screen Design 
-https://www.figma.com/community/file/1233515265201858861/Car-Dashboard?preview=fullscreen
-![alt text](https://github.com/cppqtdev/Car-Dashboard/blob/main/Figma_Screen.png)
-=======
-# PIBIT1
->>>>>>> origin/main
+# Car Simulator com velocímetro analógico
+
+Este repositório contém um projeto de simulador de carro com um widget de velocímetro analógico desenvolvido usando o framework Qt.
+
+## Características
+
+- Simula a aceleração de um carro com uma velocidade máxima de 240 km/h.
+- Apresenta um widget de velocímetro analógico com uma escala e um indicador de velocidade.
+
+## Pré-requisitos
+
+- Qt 5 ou superior instalado.
+- C++ compiler compatível com o Qt.
