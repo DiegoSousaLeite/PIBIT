@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Car-Dashboard
 Car Dashboard Using Qt QML
 
@@ -7,3 +8,6 @@ Car Dashboard Using Qt QML
 ##Figma Screen Design 
 https://www.figma.com/community/file/1233515265201858861/Car-Dashboard?preview=fullscreen
 ![alt text](https://github.com/cppqtdev/Car-Dashboard/blob/main/Figma_Screen.png)
+=======
+# PIBIT1
+>>>>>>> origin/main
