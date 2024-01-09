@@ -11,14 +11,15 @@ RadialBar::RadialBar(QQuickItem *parent)
     m_Value(50),
     m_DialWidth(15),
     m_BackgroundColor(Qt::transparent),
-    m_DialColor(QColor(80,80,80)),
-    m_ProgressColor(QColor(135,26,5)),
+    m_DialColor(QColor(80, 80, 80)),
+    m_ProgressColor(QColor(135, 26, 5)),
     m_TextColor(QColor(0, 0, 0)),
     m_SuffixText(""),
     m_ShowText(true),
     m_PenStyle(Qt::FlatCap),
     m_DialType(DialType::MinToMax)
 {
+    // Configuração inicial do RadialBar, definindo valores padrão e dimensões
     setWidth(200);
     setHeight(200);
     setSmooth(true);
@@ -27,6 +28,9 @@ RadialBar::RadialBar(QQuickItem *parent)
 
 void RadialBar::paint(QPainter *painter)
 {
+    // Função de pintura que desenha o RadialBar
+
+    // Cálculos iniciais e configurações de renderização
     double startAngle;
     double spanAngle;
     qreal size = qMin(this->width(), this->height());
@@ -38,7 +42,7 @@ void RadialBar::paint(QPainter *painter)
     pen.setCapStyle(m_PenStyle);
 
     startAngle = -90 - m_StartAngle;
-    if(FullDial != m_DialType)
+    if (FullDial != m_DialType)
     {
         spanAngle = 0 - m_SpanAngle;
     }
@@ -47,27 +51,27 @@ void RadialBar::paint(QPainter *painter)
         spanAngle = -360;
     }
 
-    //Draw outer dial
+    // Desenha o anel externo (dial)
     painter->save();
     pen.setWidth(m_DialWidth);
     pen.setColor(m_DialColor);
     painter->setPen(pen);
     qreal offset = m_DialWidth / 2;
-    if(m_DialType == MinToMax)
+    if (m_DialType == MinToMax)
     {
         painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), startAngle * 16, spanAngle * 16);
     }
-    else if(m_DialType == FullDial)
+    else if (m_DialType == FullDial)
     {
         painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), -90 * 16, -360 * 16);
     }
     else
     {
-        //do not draw dial
+        // Não desenha o dial
     }
     painter->restore();
 
-    //Draw background
+    // Desenha o fundo
     painter->save();
     painter->setBrush(m_BackgroundColor);
     painter->setPen(m_BackgroundColor);
@@ -75,14 +79,14 @@ void RadialBar::paint(QPainter *painter)
     painter->drawEllipse(rect.adjusted(inner, inner, -inner, -inner));
     painter->restore();
 
-    //Draw progress text with suffix
+    // Desenha o texto de progresso com sufixo
     painter->save();
     painter->setFont(m_TextFont);
     pen.setColor(m_TextColor);
     painter->setPen(pen);
-    if(m_ShowText)
+    if (m_ShowText)
     {
-        painter->drawText(rect.adjusted(offset, offset, -offset, -offset), Qt::AlignCenter,QString::number(m_Value) + m_SuffixText);
+        painter->drawText(rect.adjusted(offset, offset, -offset, -offset), Qt::AlignCenter, QString::number(m_Value) + m_SuffixText);
     }
     else
     {
@@ -90,19 +94,21 @@ void RadialBar::paint(QPainter *painter)
     }
     painter->restore();
 
-    //Draw progress bar
+    // Desenha a barra de progresso
     painter->save();
     pen.setWidth(m_DialWidth);
     pen.setColor(m_ProgressColor);
-    qreal valueAngle = ((m_Value - m_MinValue)/(m_MaxValue - m_MinValue)) * spanAngle;  //Map value to angle range
+    qreal valueAngle = ((m_Value - m_MinValue) / (m_MaxValue - m_MinValue)) * spanAngle;  // Mapeia o valor para a faixa de ângulo
     painter->setPen(pen);
     painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), startAngle * 16, valueAngle * 16);
     painter->restore();
 }
 
+// Métodos de configuração dos atributos do RadialBar
+
 void RadialBar::setSize(qreal size)
 {
-    if(m_Size == size)
+    if (m_Size == size)
         return;
     m_Size = size;
     emit sizeChanged();
@@ -110,7 +116,7 @@ void RadialBar::setSize(qreal size)
 
 void RadialBar::setStartAngle(qreal angle)
 {
-    if(m_StartAngle == angle)
+    if (m_StartAngle == angle)
         return;
     m_StartAngle = angle;
     emit startAngleChanged();
@@ -118,7 +124,7 @@ void RadialBar::setStartAngle(qreal angle)
 
 void RadialBar::setSpanAngle(qreal angle)
 {
-    if(m_SpanAngle == angle)
+    if (m_SpanAngle == angle)
         return;
     m_SpanAngle = angle;
     emit spanAngleChanged();
@@ -126,7 +132,7 @@ void RadialBar::setSpanAngle(qreal angle)
 
 void RadialBar::setMinValue(qreal value)
 {
-    if(m_MinValue == value)
+    if (m_MinValue == value)
         return;
     m_MinValue = value;
     emit minValueChanged();
@@ -134,7 +140,7 @@ void RadialBar::setMinValue(qreal value)
 
 void RadialBar::setMaxValue(qreal value)
 {
-    if(m_MaxValue == value)
+    if (m_MaxValue == value)
         return;
     m_MaxValue = value;
     emit maxValueChanged();
@@ -142,16 +148,16 @@ void RadialBar::setMaxValue(qreal value)
 
 void RadialBar::setValue(qreal value)
 {
-    if(m_Value == value)
+    if (m_Value == value)
         return;
     m_Value = value;
-    update();   //update the radialbar
+    update();   // Atualiza o RadialBar
     emit valueChanged();
 }
 
 void RadialBar::setDialWidth(qreal width)
 {
-    if(m_DialWidth == width)
+    if (m_DialWidth == width)
         return;
     m_DialWidth = width;
     emit dialWidthChanged();
@@ -159,7 +165,7 @@ void RadialBar::setDialWidth(qreal width)
 
 void RadialBar::setBackgroundColor(QColor color)
 {
-    if(m_BackgroundColor == color)
+    if (m_BackgroundColor == color)
         return;
     m_BackgroundColor = color;
     emit backgroundColorChanged();
@@ -167,7 +173,7 @@ void RadialBar::setBackgroundColor(QColor color)
 
 void RadialBar::setForegroundColor(QColor color)
 {
-    if(m_DialColor == color)
+    if (m_DialColor == color)
         return;
     m_DialColor = color;
     emit foregroundColorChanged();
@@ -175,7 +181,7 @@ void RadialBar::setForegroundColor(QColor color)
 
 void RadialBar::setProgressColor(QColor color)
 {
-    if(m_ProgressColor == color)
+    if (m_ProgressColor == color)
         return;
     m_ProgressColor = color;
     emit progressColorChanged();
@@ -183,7 +189,7 @@ void RadialBar::setProgressColor(QColor color)
 
 void RadialBar::setTextColor(QColor color)
 {
-    if(m_TextColor == color)
+    if (m_TextColor == color)
         return;
     m_TextColor = color;
     emit textColorChanged();
@@ -191,7 +197,7 @@ void RadialBar::setTextColor(QColor color)
 
 void RadialBar::setSuffixText(QString text)
 {
-    if(m_SuffixText == text)
+    if (m_SuffixText == text)
         return;
     m_SuffixText = text;
     emit suffixTextChanged();
@@ -199,14 +205,14 @@ void RadialBar::setSuffixText(QString text)
 
 void RadialBar::setShowText(bool show)
 {
-    if(m_ShowText == show)
+    if (m_ShowText == show)
         return;
     m_ShowText = show;
 }
 
 void RadialBar::setPenStyle(Qt::PenCapStyle style)
 {
-    if(m_PenStyle == style)
+    if (m_PenStyle == style)
         return;
     m_PenStyle = style;
     emit penStyleChanged();
@@ -214,7 +220,7 @@ void RadialBar::setPenStyle(Qt::PenCapStyle style)
 
 void RadialBar::setDialType(RadialBar::DialType type)
 {
-    if(m_DialType == type)
+    if (m_DialType == type)
         return;
     m_DialType = type;
     emit dialTypeChanged();
@@ -222,7 +228,7 @@ void RadialBar::setDialType(RadialBar::DialType type)
 
 void RadialBar::setTextFont(QFont font)
 {
-    if(m_TextFont == font)
+    if (m_TextFont == font)
         return;
     m_TextFont = font;
     emit textFontChanged();

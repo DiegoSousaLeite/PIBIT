@@ -7,6 +7,7 @@ class RadialBar : public QQuickPaintedItem
 {
     Q_OBJECT
 
+    // Propriedades para as ligações QML
     Q_PROPERTY(qreal size READ getSize WRITE setSize NOTIFY sizeChanged)
     Q_PROPERTY(qreal startAngle READ getStartAngle WRITE setStartAngle NOTIFY startAngleChanged)
     Q_PROPERTY(qreal spanAngle READ getSpanAngle WRITE setSpanAngle NOTIFY spanAngleChanged)
@@ -26,8 +27,11 @@ class RadialBar : public QQuickPaintedItem
 
 public:
     RadialBar(QQuickItem *parent = 0);
+
+    // Método de pintura personalizado
     void paint(QPainter *painter);
 
+    // Enumeração para tipos de dial
     enum DialType {
         FullDial,
         MinToMax,
@@ -35,6 +39,7 @@ public:
     };
     Q_ENUM(DialType)
 
+    // Métodos de obtenção para propriedades QML
     qreal getSize() {return m_Size;}
     qreal getStartAngle() {return m_StartAngle;}
     qreal getSpanAngle() {return m_SpanAngle;}
@@ -52,6 +57,7 @@ public:
     DialType getDialType() {return m_DialType;}
     QFont getTextFont() {return m_TextFont;}
 
+    // Métodos de configuração para propriedades QML
     void setSize(qreal size);
     void setStartAngle(qreal angle);
     void setSpanAngle(qreal angle);
@@ -70,6 +76,7 @@ public:
     void setTextFont(QFont font);
 
 signals:
+    // Sinais emitidos quando as propriedades são alteradas
     void sizeChanged();
     void startAngleChanged();
     void spanAngleChanged();
@@ -87,6 +94,7 @@ signals:
     void textFontChanged();
 
 private:
+    // Variáveis membros privadas
     qreal m_Size;
     qreal m_StartAngle;
     qreal m_SpanAngle;
@@ -106,3 +114,4 @@ private:
 };
 
 #endif // RADIALBAR_H
+
