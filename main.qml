@@ -20,26 +20,38 @@ ApplicationWindow {
     property int maxSpeed: 240                 // Velocidade máxima
     property int speed: 0                      // Velocidade atual
     property int accelerationIncrement: 5       // Incremento de aceleração
+    property real distanceTraveled: 0
+    property int initialTime: 0  // Tempo inicial em segundos
+    property real totalTimeElapsed: 0  // Inicialize com zero
+
+
+
 
     // Timer para simular aceleração contínua
     Timer {
         id: accelerationTimer
-        interval: 3000                         // Intervalo do timer em milissegundos
+        interval: 3000                        // Intervalo do timer em milissegundos
         running: true                          // O timer está em execução
         onTriggered: {
             startAcceleration();               // Função chamada quando o timer é acionado
         }
     }
 
-    // Timer para atualizar a velocidade
+
+    /// Timer para atualizar a velocidade
     Timer {
         id: speedTimer
-        interval: 500                          // Intervalo do timer em milissegundos
-        running: true                          // O timer está em execução
+        interval: 1500
+        running: true
+        repeat: true
         onTriggered: {
-            updateSpeed();                     // Função chamada quando o timer é acionado
+            totalTimeElapsed += 1.5;  // Incrementa o tempo total decorrido (exemplo: a cada 1.5 segundos)
+            updateSpeed();
+
         }
     }
+
+
 
     // Função para iniciar a aceleração
     function startAcceleration() {
@@ -47,17 +59,42 @@ ApplicationWindow {
     }
 
     // Função para atualizar a velocidade
+//    function updateSpeed() {
+//          if (accelerationTimer.running) {
+//              speed += accelerationIncrement;   // Incrementa a velocidade
+//              if (speed >= maxSpeed) {
+//                  speed = maxSpeed;
+//                  accelerationTimer.stop();      // Para o timer quando atinge a velocidade máxima
+//              }
+//          } else {
+//              nextSpeed = generateRandom();      // Gera uma nova velocidade aleatória
+//          }
+
+//          distanceLabel.text = totalDistanceTraveled.toFixed(2) + " KM";
+//          averageSpeedLabel.text = (totalDistanceTraveled / (currentTime / 1000)).toFixed(2) + " KM/H";
+//      }
+
     function updateSpeed() {
         if (accelerationTimer.running) {
-            speed += accelerationIncrement;   // Incrementa a velocidade
+            speed += accelerationIncrement;
+
             if (speed >= maxSpeed) {
                 speed = maxSpeed;
-                accelerationTimer.stop();      // Para o timer quando atinge a velocidade máxima
+                accelerationTimer.stop();
+                speedTimer.stop();
             }
+
+            // Atualiza o rótulo dinâmico da velocidade
+            distanceTraveled += speed * (1.5 / 3600); // converte a velocidade para KM/H
+            distanceLabel.text = distanceTraveled.toFixed(2) + " KM";
+            averageSpeedLabel.text = (distanceTraveled / (totalTimeElapsed/3600)).toFixed(2) + " KM/H";
+
         } else {
-            nextSpeed = generateRandom();      // Gera uma nova velocidade aleatória
+            console.log("Acceleration timer not running.");
         }
     }
+
+
 
     // Função para gerar uma velocidade aleatória
     function generateRandom() {
@@ -65,11 +102,38 @@ ApplicationWindow {
         return Math.min(newSpeed, maxSpeed);  // Garante que a velocidade não ultrapasse maxSpeed
     }
 
+    Component.onCompleted: {
+        initialTime = new Date().getTime();
+    }
+
+
     // Função para atualizar rótulos de tempo
     function updateTimeLabels() {
         currentTimeLabel.text = Qt.formatDateTime(new Date(), "hh:mm");
         currentDateLabel.text = Qt.formatDateTime(new Date(), "dd/MM/yyyy");
     }
+
+    Timer {
+        id: consoleUpdateTimer
+        interval: 1000 // Atualiza a cada 1 segundo
+        running: true
+        repeat: true
+
+        onTriggered: {
+            // Função para atualizar as informações no console
+            updateConsole();
+        }
+    }
+
+    function updateConsole() {
+        // Imprime no console para depuração
+        console.log("Speed: " + speed.toFixed(2) + " KM/H");
+        console.log("Distance Traveled: " + distanceTraveled.toFixed(2) + " KM");
+        console.log("Total Time Elapsed: " + totalTimeElapsed + " seconds");
+        console.log("Before: Speed: " + speed + ", Total Time: " + totalTimeElapsed);
+        console.log("After: Speed: " + speed + ", Total Time: " + totalTimeElapsed);
+    }
+
 
     // Timer para atualizar a velocidade aleatória em intervalos regulares
     Timer {
@@ -583,8 +647,8 @@ ApplicationWindow {
                 }
 
                 ColumnLayout{
-                    Label{
-                        text: "188 KM"
+                    Label {
+                        id: distanceLabel
                         font.pixelSize: 30
                         font.family: "Inter"
                         font.bold: Font.Normal
@@ -637,8 +701,8 @@ ApplicationWindow {
                 }
 
                 ColumnLayout{
-                    Label{
-                        text: "95 km/h"
+                    Label {
+                        id: averageSpeedLabel
                         font.pixelSize: 30
                         font.family: "Inter"
                         font.bold: Font.Normal
